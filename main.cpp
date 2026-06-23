@@ -16,7 +16,7 @@ int main(){
      Color celeste = {12,183,242,200};
     int anchoPantalla = 750;
     int largoPantalla =700;
-    InitWindow(anchoPantalla,largoPantalla,"Nombre por definir");
+    InitWindow(anchoPantalla,largoPantalla,"Asteroids");
     SetTargetFPS(60);
     nave jugador;
     enemigo alien(1, {100,100});
