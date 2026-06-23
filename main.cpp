@@ -1,41 +1,14 @@
- #include "raylib.h"
- #define VELOCIDAD 7
-    /*      CLASES      */
-    class nave{
-        public:
-        nave();
-        void proyectar();
-        void actualizar();
-        void moverD();
-        void moverI();
-        void disparar();
-        private:
-        Texture2D imagen;
-        Vector2 posicion;
-    };
-    /*      definir funciones de objetos        */
-    nave::nave(){
-        imagen = LoadTexture("Imagenes/nave64px.png");
-        posicion.x = GetScreenWidth()/2- imagen.width/2;
-        posicion.y = GetScreenHeight()- imagen.height;
-    }
-    void nave::proyectar(){
-        DrawTextureV(imagen,posicion, WHITE);
-    }
-    void nave::actualizar(){
-        if(IsKeyDown(KEY_RIGHT) && (posicion.x+7)< GetScreenWidth()-imagen.width){
-            moverD();
-        }else if (IsKeyDown(KEY_LEFT) && (posicion.x-7)> 0 ){
-            moverI();
-        }
+ #include <raylib.h>
+ #include <iostream>
+ #include "nave.hpp"
+ #include "nave.cpp"
+ 
+ #include "enemigo.hpp"
+ #include "enemigo.cpp"
+
+
+        
     
-    };
-    void nave::moverD(){
-        posicion.x += VELOCIDAD;
-    };
-    void nave::moverI(){
-        posicion.x -= VELOCIDAD;
-    }
 
     /*      FUNCION MAIN        */
 int main(){
@@ -46,12 +19,31 @@ int main(){
     InitWindow(anchoPantalla,largoPantalla,"Nombre por definir");
     SetTargetFPS(60);
     nave jugador;
+    enemigo alien(1, {100,100});
     while( !WindowShouldClose()){
         BeginDrawing();
         // GAME LOOP    
         ClearBackground(celeste);
         jugador.proyectar();
         jugador.actualizar();
+        alien.dibujar();
+        if(IsKeyDown(KEY_Z)){
+            jugador.disparar();
+            
+        }
+        //dibujar y mover balas del jugador
+        for(auto& disparo: jugador.balas){
+            disparo.dibujar();
+            disparo.mover();
+        }
+        //borrar balas viejas del jugador
+        for(auto a = jugador.balas.begin(); a != jugador.balas.end();){
+            if(!a -> vivo){
+                a = jugador.balas.erase(a);
+            } else{
+                ++ a;
+            }
+        }
 
         EndDrawing();
     }
