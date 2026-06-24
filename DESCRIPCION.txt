@@ -1,0 +1,12 @@
+Nombre del proyecto: Space Invaders
+Nombres de los integrantes: Juan Sebastian Castiblanco Suesca
+Correos de los integrantes: jcastiblancos@unal.edu.co
+Descripcion:
+este es un juego basado en el clasico juego de atari, con algunos cambios para adaptar el juego
+a algo realizable por una sola persona en el juego, se comienza con un menu de inicio basico, 
+despues el juego principal consiste en destruir 6 filas de enemigos tan rapido sea posible,
+si no se logra destruir los enemigos antes de que toquen la nave, el jugador pierde.
+el tiempo de la partida se lee y se guarda en un archivo .csv con el historial de las
+partidas y en caso de romper record, se muestra un mensaje en el menu final 
+informando que se rompio el record, de lo contrario solo se muestra el tiempo.
+el minimo tiempo es calculado con una funcion recursiva
