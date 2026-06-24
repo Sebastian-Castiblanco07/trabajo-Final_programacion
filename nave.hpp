@@ -11,6 +11,7 @@ class nave{
         void moverD();
         void moverI();
         void disparar();
+        Rectangle hitbox();
         std::vector<disparo> balas;
         private:
         Texture2D imagen;

@@ -22,3 +22,9 @@ enemigo::enemigo(int tipo,Vector2 posicion){
 void enemigo::dibujar(){
     DrawTextureV(imagenA,posicion,WHITE);
 }
+void enemigo::mover(int direccion){
+    posicion.x += direccion;
+}
+Rectangle enemigo::hitbox(){
+    return{posicion.x,posicion.y,float(imagenA.width),float(imagenA.height)};
+}

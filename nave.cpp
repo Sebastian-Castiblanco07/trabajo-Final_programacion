@@ -33,4 +33,12 @@ void nave::disparar(){
         
 
 }
+Rectangle nave::hitbox(){
+    Rectangle rectangulo;
+    rectangulo.x = posicion.x;
+    rectangulo.y = posicion.y;
+    rectangulo.width = imagen.width;
+    rectangulo.height = imagen.height;
+    return rectangulo;
+}
     

@@ -8,7 +8,8 @@ class enemigo{
         Vector2 posicion;
         enemigo(int tipo, Vector2 posicion);
         void dibujar();
-        void mover();
+        Rectangle hitbox();
+        void mover(int direccion);
         private:
 
 };

@@ -23,3 +23,11 @@ void disparo::mover(){
     }
     
 }
+Rectangle disparo::hitbox(){
+    Rectangle rectangulo;
+    rectangulo.x = posicion.x;
+    rectangulo.y = posicion.y;
+    rectangulo.width = 10;
+    rectangulo.height = 30;
+    return rectangulo;
+}
