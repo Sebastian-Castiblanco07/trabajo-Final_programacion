@@ -1,6 +1,5 @@
 #include "nave.hpp"
  #include "disparo.hpp"
- #include "disparo.cpp"
 #include <raylib.h>
 #include <vector>
 
@@ -28,7 +27,7 @@ void nave::moverI(){
         posicion.x -= VELOCIDAD;
     }
 void nave::disparar(){
-            balas.push_back(disparo({posicion.x + imagen.width/2, posicion.y},-7));
+            balas.push_back(disparo({posicion.x + imagen.width/2, posicion.y},-7,YELLOW));
             
         
 

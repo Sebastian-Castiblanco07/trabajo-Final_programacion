@@ -5,10 +5,9 @@
 #include <vector>
 #include <string>
 #include "nave.hpp"
-#include "nave.cpp"
 #include "enemigo.hpp"
-#include "enemigo.cpp"
-
+#include "disparo.hpp"
+/*           FUNCIONES              */
 const std::string ARCHIVO_CSV = "historial.csv";
 
 void guardarTiempo(int minutos, int segundos) {
@@ -28,7 +27,7 @@ std::vector<float> leerHistorial() {
         if (linea.empty()) continue;
         int m = 0, s = 0;
         if (sscanf(linea.c_str(), "%d:%d", &m, &s) == 2)
-            tiempos.push_back(m * 60.0f + s);
+            tiempos.push_back(float(m) * 60.0f + float(s));
     }
     archivo.close();
     return tiempos;
@@ -39,20 +38,22 @@ float tiempoMinimo(const std::vector<float>& tiempos, int idx) {
     float minResto = tiempoMinimo(tiempos, idx + 1);
     return tiempos[idx] < minResto ? tiempos[idx] : minResto;
 }
+/*-----------------------------------------*/
 
 std::vector<enemigo> crearMallaEnemigos() {
     std::vector<enemigo> temp_enemigos;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 11; j++) {
             int _tipo = 1;
+            float vida = 1;
             switch (i) {
-                case 0: case 1: _tipo = 3; break;
-                case 2: case 3: _tipo = 2; break;
-                default:        _tipo = 1; break;
+                case 0: case 1: _tipo = 3;vida = 3; break;
+                case 2: case 3: _tipo = 2; vida = 2; break;
+                default:        _tipo = 1;  break;
             }
             float x = 60 + j * 60;
             float y = 10 + i * 50;
-            temp_enemigos.push_back(enemigo(_tipo, {x, y}));
+            temp_enemigos.push_back(enemigo(_tipo, {x, y}, vida));
         }
     }
     return temp_enemigos;
@@ -127,7 +128,8 @@ void menuFinal(bool victoria, float tiempoPartida) {
         EndDrawing();
     }
 }
-
+/*////////////////////////////////////////////////////*/ 
+/*      FUNCION MAIN        */
 int main() {
     int anchoPantalla = 750;
     int largoPantalla = 700;
@@ -141,13 +143,14 @@ int main() {
 
     nave jugador;
     std::vector<enemigo> enemigos = crearMallaEnemigos();
+    std::vector<disparo> balas_enemgos;
     int direccionEnemigos = 1;
     float ultimoDisparoJugador = 0;
     bool gameover = false;
     bool victoria = false;
     float tiempoPartida = 0.0f;
-
-    while (!WindowShouldClose() && !gameover) {
+    /*      GAMELOOP PRICIPAL       */
+     while (!WindowShouldClose() && !gameover) {
         float dt = GetFrameTime();
         tiempoPartida += dt;
         ultimoDisparoJugador++;
@@ -157,24 +160,31 @@ int main() {
 
         jugador.proyectar();
         jugador.actualizar();
-
+        /*          COOLDOWN DE LAS BALAS           */
         if (IsKeyDown(KEY_Z) && ultimoDisparoJugador > 10) {
             jugador.disparar();
             ultimoDisparoJugador = 0;
         }
-
+        //-------------------------------------
+        /*          MOVER BALAS             */
         for (auto& disparo : jugador.balas) {
-            disparo.dibujar();
             disparo.mover();
+            disparo.dibujar();
         }
-        for (auto a = jugador.balas.begin(); a != jugador.balas.end();) {
+        for(auto& disparo : balas_enemgos ){
+            disparo.mover();
+            disparo.dibujar();
+        }
+        /*---------------------------------------*/
+        for (auto a = jugador.balas.begin(); a != jugador.balas.end();) { // eliminar balas muertas
             if (!a->vivo) a = jugador.balas.erase(a);
             else ++a;
         }
+        /*--------------------------------------*/
 
-        for (auto& e : enemigos) e.dibujar();
-
-        for (auto& e : enemigos) {
+        for (auto& e : enemigos) e.dibujar(); //dibujar los enemigos
+        /*       ACTUALIZAR A LOS ENEMIGOS        */
+        for (auto& e : enemigos) { 
             if (e.posicion.x + e.imagenA.width > GetScreenWidth()) {
                 for (auto& e2 : enemigos) e2.posicion.y += 6;
                 direccionEnemigos = -2;
@@ -182,31 +192,56 @@ int main() {
                 for (auto& e2 : enemigos) e2.posicion.y += 6;
                 direccionEnemigos = 2;
             }
+
             e.mover(direccionEnemigos);
         }
-
-        for (auto& disparo : jugador.balas) {
+        {
             auto a = enemigos.begin();
-            while (a != enemigos.end()) {
-                if (CheckCollisionRecs(a->hitbox(), disparo.hitbox())) {
+            while(a<enemigos.end()){
+                if(a->posicion.y>float(GetScreenHeight())){
                     a = enemigos.erase(a);
+                }
+                if (enemigos.empty()) {
+                        gameover = true;
+                        victoria = true;
+                    }
+            a++;
+            }
+            
+        }
+        /*--------------------------------------------*/
+
+        for (auto& disparo : jugador.balas) { //Colisiones entre balas y enemigos
+            auto a = enemigos.begin();
+            while (a < enemigos.end()) {
+                if (CheckCollisionRecs(a->hitbox(), disparo.hitbox())) {
+                    a->disparar(balas_enemgos);//remover luego     
+                    a->vida = a->vida - disparo.danio;
                     disparo.vivo = false;
+                    if(a->vida <= 0 ){
+                        a = enemigos.erase(a);
+                    }
                     if (enemigos.empty()) {
                         gameover = true;
                         victoria = true;
                     }
-                } else {
-                    ++a;
-                }
+                    
+                };
+                a++;
+                std::cout<<a->posicion.y<<'\n';
+                //std::cout<<enemigos.size()<<'\n';
             }
+            
         }
+        /*---------------------------------------*/
 
-        for (auto& e : enemigos) {
+        for (auto& e : enemigos) {//colisiones entre enemigos y jugador
             if (CheckCollisionRecs(e.hitbox(), jugador.hitbox())) {
                 gameover = true;
                 victoria = false;
             }
         }
+        /*------------------------*/
 
         {
             int min = (int)tiempoPartida / 60;

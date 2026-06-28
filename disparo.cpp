@@ -2,21 +2,23 @@
 #include <raylib.h>
 #include <iostream>
 
-disparo::disparo(Vector2 posicion,int velocidad){
-this -> posicion = posicion;
-this -> velocidad = velocidad;
+disparo::disparo(Vector2 _posicion,int _velocidad , Color _color_disparo ){
+this -> posicion = _posicion;
+this -> velocidad = _velocidad;
 this -> vivo = true;
+this -> danio = 1; 
+this -> color_disparo = _color_disparo;
 }
 
 void disparo::dibujar(){
     if(vivo){
-        DrawRectangle(posicion.x,posicion.y,10,30,YELLOW);
+        DrawRectangle((int)posicion.x, (int)posicion.y, 10, 30, color_disparo);
     }
 }
 void disparo::mover(){
-    posicion.y += velocidad;
+    posicion.y += float(velocidad);
     if(vivo){
-        if(posicion.y < 0 || posicion.y>GetScreenHeight() ){
+        if(posicion.y < 0 || posicion.y > float(GetScreenHeight()) ){
             vivo = false; 
         }
         
